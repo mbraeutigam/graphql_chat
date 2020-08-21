@@ -1,10 +1,10 @@
-import React from "react";
-import { gql, useQuery } from "@apollo/client";
+import React, { useEffect } from "react";
+import { gql, useSubscription } from "@apollo/client";
 import { Timeline } from "antd";
 import { format } from "date-fns";
 
 const GET_MESSAGES = gql`
-  query {
+  subscription {
     messages {
       id
       user
@@ -15,7 +15,8 @@ const GET_MESSAGES = gql`
 `;
 
 const Messages = ({ user }) => {
-  const { data } = useQuery(GET_MESSAGES);
+  const { data } = useSubscription(GET_MESSAGES);
+
   if (!data) {
     return null;
   }
@@ -33,8 +34,7 @@ const Messages = ({ user }) => {
                 <br />
                 {format(new Date(date), "yyyy-MM-dd hh:mm")}
               </div>
-            }
-          >
+            }>
             {content}
           </Timeline.Item>
         ))}

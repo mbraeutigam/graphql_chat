@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button } from "antd";
 import { gql, useMutation } from "@apollo/client";
 
@@ -11,12 +11,13 @@ const POST_MESSAGE = gql`
 const ChatInputForm = (props) => {
   const [form] = Form.useForm();
   const { user } = props;
-  const [postMessage, { data }] = useMutation(POST_MESSAGE);
+  const [postMessage] = useMutation(POST_MESSAGE);
 
   const onFinish = (values) => {
     console.log(values);
-
-    postMessage({ variables: { user: values.name, content: values.content } });
+    postMessage({
+      variables: { user: values.name, content: values.content },
+    });
   };
 
   const onReset = () => {
@@ -28,16 +29,14 @@ const ChatInputForm = (props) => {
       <Form.Item
         name="name"
         label="Name"
-        initialValue={user}
         rules={[{ required: true, message: "Name is required" }]}
-      >
+        initialValue={user}>
         <Input placeholder="Please enter a name..." />
       </Form.Item>
       <Form.Item
         name="content"
         label="Message"
-        rules={[{ required: true, message: "Message is required" }]}
-      >
+        rules={[{ required: true, message: "Message is required" }]}>
         <Input placeholder="Please enter a message..." />
       </Form.Item>
 
