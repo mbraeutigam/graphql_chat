@@ -8,6 +8,7 @@ import {
   useMutation,
 } from "@apollo/client";
 import { Form, Timeline, Input, Button } from "antd";
+import { format } from "date-fns";
 
 import "./Chat.css";
 
@@ -40,7 +41,7 @@ const Messages = ({ user }) => {
   }
 
   return (
-    <div>
+    <div className="chat__content">
       <Timeline mode="alternate" pending>
         {data.messages.map(({ id, user: messageUser, content, date }) => (
           <Timeline.Item
@@ -50,7 +51,7 @@ const Messages = ({ user }) => {
               <div>
                 <b>{messageUser}</b>
                 <br />
-                {date}
+                {format(new Date(date), "yyyy-MM-dd hh:mm")}
               </div>
             }
           >
@@ -111,11 +112,11 @@ const Chat = () => {
   const [user, setUser] = useState({ user: "Marc", content: "" });
   return (
     <div>
-      <div>
-        <Messages user={user.user} />
-      </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <ChatInputForm user={user.user} />
+      </div>
+      <div>
+        <Messages user={user.user} />
       </div>
     </div>
   );
