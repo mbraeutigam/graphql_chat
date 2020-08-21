@@ -6,6 +6,9 @@ import {
   ApolloProvider,
   useQuery,
 } from "@apollo/client";
+import { Timeline } from "antd";
+
+import "./Chat.css";
 
 const client = new ApolloClient({
   uri: "http://localhost:8000/graphql",
@@ -18,6 +21,7 @@ const GET_MESSAGES = gql`
       id
       user
       content
+      date
     }
   }
 `;
@@ -28,7 +32,27 @@ const Messages = ({ user }) => {
     return null;
   }
 
-  return JSON.stringify(data);
+  return (
+    <div>
+      <Timeline mode="alternate" pending>
+        {data.messages.map(({ id, user: messageUser, content, date }) => (
+          <Timeline.Item
+            key={id}
+            position={user === messageUser ? "left" : "right"}
+            label={
+              <div>
+                <b>{messageUser}</b>
+                <br />
+                {date}
+              </div>
+            }
+          >
+            {content}
+          </Timeline.Item>
+        ))}
+      </Timeline>
+    </div>
+  );
 };
 
 function Chat() {
