@@ -3,12 +3,13 @@ const http = require("http");
 const { ApolloServer, gql, PubSub } = require("apollo-server-express");
 const GraphQLISODate = require("graphql-iso-date");
 const { GraphQLDateTime } = GraphQLISODate;
+const { v4: uuidv4 } = require("uuid");
 
 const PORT = 8000;
 const pubsub = new PubSub();
 
-const messages = [];
-const MESSAGE_ADDED = "MESSAGE_ADDED";
+let messages = [];
+const MESSAGES = "MESSAGES";
 const subscribers = [];
 const onMessageUpdates = (fn) => subscribers.push(fn);
 
@@ -28,6 +29,7 @@ const typeDefs = gql`
 
   type Mutation {
     postMessage(user: String!, content: String!): ID!
+    deleteMessage(id: String!): Boolean
   }
 
   type Subscription {
@@ -42,7 +44,7 @@ const resolvers = {
   },
   Mutation: {
     postMessage: (parent, args, context) => {
-      const id = messages.length;
+      const id = uuidv4();
       const { user, content } = args;
       const dataset = {
         id,
@@ -52,19 +54,23 @@ const resolvers = {
       };
       messages.push(dataset);
       subscribers.forEach((fn) => fn());
-      // pubsub.publish(MESSAGE_ADDED, { messageAdded: dataset });
       return id;
+    },
+    deleteMessage: (parent, args, context) => {
+      const { id } = args;
+      messages = messages.filter((e) => e.id !== id);
+      subscribers.forEach((fn) => fn());
     },
   },
   Subscription: {
     messages: {
       subscribe: (parent, arg, { pubsub }) => {
-        onMessageUpdates(() => pubsub.publish(MESSAGE_ADDED, { messages }));
+        onMessageUpdates(() => pubsub.publish(MESSAGES, { messages }));
         setTimeout(() => {
           // on subscribe send messages instantly
-          pubsub.publish(MESSAGE_ADDED, { messages });
+          pubsub.publish(MESSAGES, { messages });
         }, 0);
-        return pubsub.asyncIterator([MESSAGE_ADDED]);
+        return pubsub.asyncIterator([MESSAGES]);
       },
     },
   },

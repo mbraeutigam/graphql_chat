@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
-import { gql, useSubscription } from "@apollo/client";
+import { gql, useSubscription, useMutation } from "@apollo/client";
 import { Timeline } from "antd";
+import { CloseCircleOutlined } from "@ant-design/icons";
 import { format } from "date-fns";
 
 const GET_MESSAGES = gql`
@@ -14,8 +15,21 @@ const GET_MESSAGES = gql`
   }
 `;
 
+const DELETE_MESSAGE = gql`
+  mutation($id: String!) {
+    deleteMessage(id: $id)
+  }
+`;
+
 const Messages = ({ user }) => {
   const { data } = useSubscription(GET_MESSAGES);
+  const [delMsg] = useMutation(DELETE_MESSAGE);
+
+  const deleteMessage = (id) => {
+    delMsg({
+      variables: { id },
+    });
+  };
 
   if (!data) {
     return null;
@@ -34,6 +48,11 @@ const Messages = ({ user }) => {
                 <br />
                 {format(new Date(date), "yyyy-MM-dd hh:mm")}
               </div>
+            }
+            dot={
+              messageUser === user ? (
+                <CloseCircleOutlined onClick={() => deleteMessage(id)} />
+              ) : null
             }>
             {content}
           </Timeline.Item>
