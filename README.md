@@ -6,6 +6,7 @@
 - [x] GraphQL (Apollo Server)
 - [x] knex.js
 - [x] PubSub
+- [x] SQLite
 
 ### Client-side components
 
