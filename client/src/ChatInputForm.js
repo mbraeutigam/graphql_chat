@@ -29,10 +29,11 @@ const ChatInputForm = (props) => {
       <Form.Item
         name="name"
         label="Name"
-        rules={[{ required: true, message: "Name is required" }]}
+        rules={[{ required: true, message: "Benötigtes Feld!" }]}
         initialValue={user}>
         <Input
-          placeholder="Please enter a name..."
+          placeholder="Ihr Name..."
+          style={{ width: 150 }}
           onChange={(e) =>
             setChatMessage({ ...chatMessage, user: e.target.value })
           }
@@ -40,18 +41,23 @@ const ChatInputForm = (props) => {
       </Form.Item>
       <Form.Item
         name="message"
-        label="Message"
-        rules={[{ required: true, message: "Message is required" }]}>
-        <Input placeholder="Please enter a message..." />
+        label="Nachricht"
+        rules={[
+          {
+            required: true,
+            message: "Benötigtes Feld!",
+          },
+        ]}>
+        <Input style={{ width: 200 }} placeholder="Ihre Nachricht..." />
       </Form.Item>
 
       <Form.Item>
         <Button type="primary" htmlType="submit">
-          Send Message
+          Abschicken
         </Button>{" "}
-        <Button htmlType="button" onClick={onReset}>
-          Reset
-        </Button>
+        {/* <Button htmlType="button" onClick={onReset}>
+          Zurücksetzen
+        </Button> */}
       </Form.Item>
     </Form>
   );
