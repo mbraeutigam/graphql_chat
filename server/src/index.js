@@ -45,12 +45,13 @@ const resolvers = {
   Mutation: {
     postMessage: (parent, args, context) => {
       const id = uuidv4();
-      const { user, content } = args;
+      const { user, content, room = "default" } = args;
       const dataset = {
         id,
         user,
         content,
         date: new Date(),
+        room,
       };
       messages.push(dataset);
       subscribers.forEach((fn) => fn());
@@ -65,6 +66,7 @@ const resolvers = {
   Subscription: {
     messages: {
       subscribe: (parent, arg, { pubsub }) => {
+        // currently NO USE of withFilter() - everybody will get notified about
         onMessageUpdates(() => pubsub.publish(MESSAGES, { messages }));
         setTimeout(() => {
           // on subscribe send messages instantly
