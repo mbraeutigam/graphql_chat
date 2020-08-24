@@ -8,10 +8,18 @@ const { v4: uuidv4 } = require("uuid");
 const PORT = 8000;
 const pubsub = new PubSub();
 
-let messages = [];
 const MESSAGES = "MESSAGES";
 const subscribers = [];
 const onMessageUpdates = (fn) => subscribers.push(fn);
+
+const knex = require("knex")({
+  client: "sqlite3",
+  connection: {
+    filename: "./db/chat.sqlite",
+  },
+  useNullAsDefault: true,
+});
+const TBL_CHATMESSAGES = "ChatMessages";
 
 const typeDefs = gql`
   scalar GraphQLDateTime
@@ -19,7 +27,7 @@ const typeDefs = gql`
   type Message {
     id: ID!
     user: String!
-    content: String!
+    message: String!
     date: GraphQLDateTime!
   }
 
@@ -28,7 +36,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    postMessage(user: String!, content: String!): ID!
+    postMessage(user: String!, message: String!, room: String): ID!
     deleteMessage(id: String!): Boolean
   }
 
@@ -37,39 +45,66 @@ const typeDefs = gql`
   }
 `;
 
+const getMessages = async (room) => {
+  const result = await knex(TBL_CHATMESSAGES).where("room", room);
+  return result;
+};
+
 const resolvers = {
   GraphQLDateTime,
   Query: {
-    messages: () => messages,
+    messages: async (parent, args, context, info) => {
+      const { room = "default" } = args;
+      const msgs = await getMessages(room);
+
+      return msgs;
+    },
   },
   Mutation: {
-    postMessage: (parent, args, context) => {
+    postMessage: async (parent, args, context, info) => {
       const id = uuidv4();
-      const { user, content, room = "default" } = args;
+      const { user, message, room = "default" } = args;
       const dataset = {
         id,
         user,
-        content,
-        date: new Date(),
+        message,
+        date: new Date().toISOString(),
         room,
       };
-      messages.push(dataset);
-      subscribers.forEach((fn) => fn());
+
+      try {
+        await knex(TBL_CHATMESSAGES).insert(dataset);
+        subscribers.forEach((fn) => fn());
+      } catch (error) {
+        console.error(error);
+      }
       return id;
     },
-    deleteMessage: (parent, args, context) => {
+    deleteMessage: async (parent, args, context, info) => {
       const { id } = args;
-      messages = messages.filter((e) => e.id !== id);
-      subscribers.forEach((fn) => fn());
+
+      try {
+        await knex(TBL_CHATMESSAGES).delete().where("id", id);
+        console.log(`Deleted ${id}`);
+        subscribers.forEach((fn) => fn());
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
   Subscription: {
     messages: {
-      subscribe: (parent, arg, { pubsub }) => {
+      subscribe: async (parent, args, { pubsub }, info) => {
         // currently NO USE of withFilter() - everybody will get notified about
-        onMessageUpdates(() => pubsub.publish(MESSAGES, { messages }));
-        setTimeout(() => {
+        const { room = "default" } = args;
+
+        onMessageUpdates(async () => {
+          const messages = await getMessages(room);
+          pubsub.publish(MESSAGES, { messages });
+        });
+        setTimeout(async () => {
           // on subscribe send messages instantly
+          const messages = await getMessages(room);
           pubsub.publish(MESSAGES, { messages });
         }, 0);
         return pubsub.asyncIterator([MESSAGES]);

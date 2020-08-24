@@ -10,6 +10,8 @@
     "apollo-server-express": "^2.16.1",
     "express": "^4.17.1",
     "graphql-iso-date": "^3.6.1",
+    "knex": "^0.21.5",
+    "sqlite3": "^5.0.0",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
