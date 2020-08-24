@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { gql, useSubscription, useMutation } from "@apollo/client";
 import { Timeline } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
@@ -55,8 +55,7 @@ const Messages = ({ user }) => {
                   }
                 />
               ) : null
-            }
-          >
+            }>
             {message}
           </Timeline.Item>
         ))}

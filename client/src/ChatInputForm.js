@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Form, Input, Button } from "antd";
 import { gql, useMutation } from "@apollo/client";
 
@@ -30,8 +30,7 @@ const ChatInputForm = (props) => {
         name="name"
         label="Name"
         rules={[{ required: true, message: "Name is required" }]}
-        initialValue={user}
-      >
+        initialValue={user}>
         <Input
           placeholder="Please enter a name..."
           onChange={(e) =>
@@ -42,8 +41,7 @@ const ChatInputForm = (props) => {
       <Form.Item
         name="message"
         label="Message"
-        rules={[{ required: true, message: "Message is required" }]}
-      >
+        rules={[{ required: true, message: "Message is required" }]}>
         <Input placeholder="Please enter a message..." />
       </Form.Item>
 
