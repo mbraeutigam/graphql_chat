@@ -9,7 +9,7 @@ const GET_MESSAGES = gql`
     messages {
       id
       user
-      content
+      message
       date
     }
   }
@@ -36,9 +36,9 @@ const Messages = ({ user }) => {
   }
 
   return (
-    <div className="chat__content">
+    <div className="chat__message">
       <Timeline mode="alternate" pending>
-        {data.messages.map(({ id, user: messageUser, content, date }) => (
+        {data.messages.map(({ id, user: messageUser, message, date }) => (
           <Timeline.Item
             key={id}
             position={user === messageUser ? "left" : "right"}
@@ -53,8 +53,9 @@ const Messages = ({ user }) => {
               messageUser === user ? (
                 <CloseCircleOutlined onClick={() => deleteMessage(id)} />
               ) : null
-            }>
-            {content}
+            }
+          >
+            {message}
           </Timeline.Item>
         ))}
       </Timeline>

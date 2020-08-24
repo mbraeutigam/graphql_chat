@@ -3,20 +3,20 @@ import { Form, Input, Button } from "antd";
 import { gql, useMutation } from "@apollo/client";
 
 const POST_MESSAGE = gql`
-  mutation($user: String!, $content: String!) {
-    postMessage(user: $user, content: $content)
+  mutation($user: String!, $message: String!, $room: String) {
+    postMessage(user: $user, message: $message, room: $room)
   }
 `;
 
 const ChatInputForm = (props) => {
   const [form] = Form.useForm();
-  const { user } = props;
+  const { chatMessage, setChatMessage } = props;
+  const { user } = chatMessage;
   const [postMessage] = useMutation(POST_MESSAGE);
 
   const onFinish = (values) => {
-    console.log(values);
     postMessage({
-      variables: { user: values.name, content: values.content },
+      variables: { user: values.name, message: values.message },
     });
   };
 
@@ -30,13 +30,20 @@ const ChatInputForm = (props) => {
         name="name"
         label="Name"
         rules={[{ required: true, message: "Name is required" }]}
-        initialValue={user}>
-        <Input placeholder="Please enter a name..." />
+        initialValue={user}
+      >
+        <Input
+          placeholder="Please enter a name..."
+          onChange={(e) =>
+            setChatMessage({ ...chatMessage, user: e.target.value })
+          }
+        />
       </Form.Item>
       <Form.Item
-        name="content"
+        name="message"
         label="Message"
-        rules={[{ required: true, message: "Message is required" }]}>
+        rules={[{ required: true, message: "Message is required" }]}
+      >
         <Input placeholder="Please enter a message..." />
       </Form.Item>
 
