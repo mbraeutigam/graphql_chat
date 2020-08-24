@@ -9,7 +9,10 @@ const Chat = () => {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <ChatInputForm user={chatMessage.user} />
+        <ChatInputForm
+          chatMessage={chatMessage}
+          setChatMessage={setChatMessage}
+        />
       </div>
       <div>
         <Messages user={chatMessage.user} />

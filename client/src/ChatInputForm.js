@@ -10,7 +10,8 @@ const POST_MESSAGE = gql`
 
 const ChatInputForm = (props) => {
   const [form] = Form.useForm();
-  const { user } = props;
+  const { chatMessage, setChatMessage } = props;
+  const { user } = chatMessage;
   const [postMessage] = useMutation(POST_MESSAGE);
 
   const onFinish = (values) => {
@@ -30,13 +31,20 @@ const ChatInputForm = (props) => {
         name="name"
         label="Name"
         rules={[{ required: true, message: "Name is required" }]}
-        initialValue={user}>
-        <Input placeholder="Please enter a name..." />
+        initialValue={user}
+      >
+        <Input
+          placeholder="Please enter a name..."
+          onChange={(e) =>
+            setChatMessage({ ...chatMessage, user: e.target.value })
+          }
+        />
       </Form.Item>
       <Form.Item
         name="content"
         label="Message"
-        rules={[{ required: true, message: "Message is required" }]}>
+        rules={[{ required: true, message: "Message is required" }]}
+      >
         <Input placeholder="Please enter a message..." />
       </Form.Item>
 
