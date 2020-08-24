@@ -6,12 +6,14 @@ const { GraphQLDateTime } = GraphQLISODate;
 const { v4: uuidv4 } = require("uuid");
 
 const PORT = 8000;
-const pubsub = new PubSub();
 
+// PubSub
+const pubsub = new PubSub();
 const MESSAGES = "MESSAGES";
 const subscribers = [];
 const onMessageUpdates = (fn) => subscribers.push(fn);
 
+// Database
 const knex = require("knex")({
   client: "sqlite3",
   connection: {
@@ -21,6 +23,7 @@ const knex = require("knex")({
 });
 const TBL_CHATMESSAGES = "ChatMessages";
 
+// GraphQL
 const typeDefs = gql`
   scalar GraphQLDateTime
 
@@ -113,6 +116,7 @@ const resolvers = {
   },
 };
 
+// Server
 const app = express();
 const server = new ApolloServer({
   typeDefs,

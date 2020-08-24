@@ -4,6 +4,7 @@ import { Timeline } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { format } from "date-fns";
 
+// GraphQL subscription queries & mutations
 const GET_MESSAGES = gql`
   subscription {
     messages {
@@ -23,23 +24,18 @@ const DELETE_MESSAGE = gql`
 
 const Messages = ({ user }) => {
   const { data } = useSubscription(GET_MESSAGES);
-  const [delMsg] = useMutation(DELETE_MESSAGE);
-
-  const deleteMessage = (id) => {
-    delMsg({
-      variables: { id },
-    });
-  };
+  const [deleteMessage] = useMutation(DELETE_MESSAGE);
 
   if (!data) {
     return null;
   }
 
   return (
-    <div className="chat__message">
+    <div className="chat__messages">
       <Timeline mode="alternate" pending>
         {data.messages.map(({ id, user: messageUser, message, date }) => (
           <Timeline.Item
+            className="chat__message"
             key={id}
             position={user === messageUser ? "left" : "right"}
             label={
@@ -51,7 +47,13 @@ const Messages = ({ user }) => {
             }
             dot={
               messageUser === user ? (
-                <CloseCircleOutlined onClick={() => deleteMessage(id)} />
+                <CloseCircleOutlined
+                  onClick={() =>
+                    deleteMessage({
+                      variables: { id },
+                    })
+                  }
+                />
               ) : null
             }
           >
